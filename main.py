@@ -7,6 +7,9 @@ import csv
 import retry
 from retrying import retry
 
+from sign import getSign
+from sign505 import getSign505
+
 
 @retry(wait_fixed=2000, stop_max_attempt_number=3)
 def make_request(url, header, date):
@@ -14,6 +17,18 @@ def make_request(url, header, date):
     res.raise_for_status()
     return res
 
+
+course_list_payload = {
+    "albumGoodsId": "108745",
+    "choice": False,
+    "currentPage": 0,
+    "pageSize": 30,
+    "sortType": "asc"
+}
+timestamp = "1699171687"
+useId = "6007476"
+sign = getSign(timestamp)
+sign505 = getSign505(course_list_payload, timestamp, useId)
 
 csv_file_name = "course_data.csv"
 course_headers = {
@@ -25,9 +40,9 @@ course_headers = {
     'Channel': 'Android',
     'Accountid': 'ylyk_app',
     'Systeminfo': '9;M973Q',
-    'Timestamp': '1699170899',
-    'Sign': '5e6f6cca72a6abb65b90e3165844663f',
-    'Sign505': '0d2e276c1d1df77266811a9eafd2ab09',
+    'Timestamp': timestamp,
+    'Sign': sign,
+    'Sign505': sign505,
     'Version': '5.7.1',
     'Buildversion': '23102601',
     'Anonymousid': 'cf514ff1a936d6f7',
@@ -37,13 +52,6 @@ course_headers = {
     'User-Agent': 'okhttp/4.9.0'
 }
 course_list_url = "https://new-app-api.ylyk.com/v1/goods/getFilterAlbumCourseGoodsList"
-course_list_payload = {
-    "albumGoodsId": "108745",
-    "choice": False,
-    "currentPage": 0,
-    "pageSize": 30,
-    "sortType": "asc"
-}
 
 response = make_request(course_list_url, course_headers, course_list_payload)
 course_data = response.json()
@@ -61,12 +69,12 @@ for course in course_data["data"]["list"]:
         'Content-Length': '20',
         'Deviceid': 'cf514ff1a936d6f7',
         'Version': '5.7.1',
-        'Sign': '31e5257940c4113c70c8c4bb25d8b34f',
+        'Sign': sign,
         'User-Agent': 'Mozilla/5.0 (Linux; Android 9; M973Q Build/PQ3A.190605.10261546; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/91.0.4472.114 Mobile Safari/537.36',
         'Anonymousid': 'cf514ff1a936d6f7',
         'Content-Type': 'application/json',
         'Accept': 'application/json, text/plain, */*',
-        'Timestamp': '1699171687',
+        'Timestamp': timestamp,
         'Userid': '6007476',
         'Buildversion': '23102601',
         'Channel': 'Android',
